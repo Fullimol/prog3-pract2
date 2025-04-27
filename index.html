@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica 2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="spinner-container hidden">
+        <div class="spinner"></div>
+        <p class="spinner-text">Cargando...</p>
+    </div>
+
+
+    <h1>Practica 02</h1>
+
+    <div class="container-tabla">
+        <table id="tablaPersonas">
+            <thead>
+                <tr>
+                    <th id="th_id" class="col-id">ID</th>
+                    <th id="th_nombre" class="col-nombre">Nombre</th>
+                    <th id="th_apellido" class="col-apellido">Apellido</th>
+                    <th id="th_edad" class="col-edad">Edad</th>
+                    <th id="th_equipo" class="col-equipo">Equipo</th>
+                    <th id="th_posicion" class="col-posicion">Posición</th>
+                    <th id="th_cantGoles" class="col-cantGoles">CantGoles</th>
+                    <th id="th_titulo" class="col-titulo">Título</th>
+                    <th id="th_facultad" class="col-facultad">Facultad</th>
+                    <th id="th_anoGradu" class="col-anioGraduacion">AnoGradu</th>
+                    <th id="th_modificar" class="col-modificar">Modificar</th>
+                    <th id="th_eliminar" class="col-eliminar">Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+
+        <button id="btnAgregar" class="btn-agregar">Agregar Elemento</button>
+    </div>
+
+    <div class="container-form">
+        <h3>Form ABM</h3>
+        <p>(aca va texto modificable '"Alta", "Baja", "Modificación"')</p>
+        <form id="formulario">
+            <div class="input-container">
+                <label for="id">ID:</label>
+                <input type="text" id="input-id" name="id" readonly>
+
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="input-nombre" name="nombre">
+
+                <label for="apellido">Apellido:</label>
+                <input type="text" id="input-apellido" name="apellido">
+
+                <label for="edad">Edad:</label>
+                <input type="number" id="input-edad" name="edad">
+
+                <label for="equipo">Equipo:</label>
+                <input type="text" id="input-equipo" name="equipo">
+
+                <label for="posicion">Posición:</label>
+                <input type="text" id="input-posicion" name="posicion">
+
+                <label for="cantGoles">CantGoles:</label>
+                <input type="number" id="input-cantGoles" name="cantGoles">
+
+                <label for="titulo">Título:</label>
+                <input type="text" id="input-tituloUni" name="titulo">
+
+                <label for="facultad">Facultad:</label>
+                <input type="text" id="input-facultad" name="facultad">
+
+                <label for="anioGrad">AñoGraduacion:</label>
+                <input type="number" id="input-anioGrad" name="anioGrad">
+            </div>
+
+
+            <div class="btn-container">
+                <button id="btnAceptar">Aceptar</button>
+                <button id="btnCancelar">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>
