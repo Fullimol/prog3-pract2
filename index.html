@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div class="spinner-container hidden">
+    <div id="spinner" class="spinner-container hidden">
         <div class="spinner"></div>
         <p class="spinner-text">Cargando...</p>
     </div>
@@ -42,9 +42,9 @@
         <button id="btnAgregar" class="btn-agregar">Agregar Elemento</button>
     </div>
 
-    <div class="container-form">
+    <div class="container-form hidden">
         <h3>Form ABM</h3>
-        <p>(aca va texto modificable '"Alta", "Baja", "Modificación"')</p>
+        <p id="texto-form"></p>
         <form id="formulario">
             <div class="input-container">
                 <label for="id">ID:</label>

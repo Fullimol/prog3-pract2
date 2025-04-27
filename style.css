@@ -1,18 +1,26 @@
 /* TABLA */
 .container-tabla {
-    display: flex; /* Flexbox para alinear elementos */
-    flex-direction: column; /* Alineación vertical */
-    align-items: center; /* Centra horizontalmente los elementos */
-    justify-content: center; /* Centra verticalmente los elementos */
-    margin: auto; /* Centra la tabla en la página */
+    display: flex;
+    /* Flexbox para alinear elementos */
+    flex-direction: column;
+    /* Alineación vertical */
+    align-items: center;
+    /* Centra horizontalmente los elementos */
+    justify-content: center;
+    /* Centra verticalmente los elementos */
+    margin: auto;
+    /* Centra la tabla en la página */
 }
 
 table {
-    border-collapse: collapse; /* Estilo limpio para la tabla */
-    margin-bottom: 10px; /* Espacio entre la tabla y el botón */
+    border-collapse: collapse;
+    /* Estilo limpio para la tabla */
+    margin-bottom: 10px;
+    /* Espacio entre la tabla y el botón */
 }
 
-th, td {
+th,
+td {
     border: 1px solid #ccc;
     padding: 8px;
     text-align: center;
@@ -22,15 +30,19 @@ th, td {
     padding: 10px 20px;
     font-size: 14px;
     cursor: pointer;
-    background-color: #4CAF50; /* Color del botón */
-    color: white; /* Color del texto */
+    background-color: #4CAF50;
+    /* Color del botón */
+    color: white;
+    /* Color del texto */
     border: none;
-    border-radius: 5px; /* Bordes redondeados */
+    border-radius: 5px;
+    /* Bordes redondeados */
     transition: background-color 0.3s;
 }
 
 .btn-agregar:hover {
-    background-color: #45a049; /* Efecto hover */
+    background-color: #45a049;
+    /* Efecto hover */
 }
 
 
@@ -53,8 +65,9 @@ h3 {
     margin: 0;
 }
 
-#input-id{
-    background-color: #f0f0f0; /* Color de fondo del input */
+#input-id {
+    background-color: #f0f0f0;
+    /* Color de fondo del input */
 }
 
 form {
@@ -77,9 +90,10 @@ input {
     box-sizing: border-box;
 }
 
-.btn-container{
+.btn-container {
     display: flex;
-    justify-content: space-around; /* Espacio entre los botones */
+    justify-content: space-around;
+    /* Espacio entre los botones */
 }
 
 button {
@@ -91,12 +105,14 @@ button {
     border-radius: 4px;
     cursor: pointer;
     color: white;
-    background-color: #4CAF50; /* Color de fondo para los botones */
+    background-color: #4CAF50;
+    /* Color de fondo para los botones */
     transition: background-color 0.3s;
 }
 
-#btnCancelar{
-    background-color: #f44336; /* Color de fondo para el botón de cancelar */
+#btnCancelar {
+    background-color: #f44336;
+    /* Color de fondo para el botón de cancelar */
 }
 
 button:hover {
@@ -109,13 +125,16 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: fixed; /* Fija el spinner en la pantalla */
+    position: fixed;
+    /* Fija el spinner en la pantalla */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(39, 39, 39, 0.8); /* Fondo blanco con opacidad */
-    z-index: 9999; /* Asegura que el spinner esté por encima de otros elementos */
+    background-color: rgba(39, 39, 39, 0.8);
+    /* Fondo blanco con opacidad */
+    z-index: 9999;
+    /* Asegura que el spinner esté por encima de otros elementos */
 }
 
 .spinner {
@@ -131,12 +150,13 @@ button:hover {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
 }
 
-.spinner-container p{
+.spinner-container p {
     font-family: Arial, sans-serif;
     font-size: 50px;
     color: red;
