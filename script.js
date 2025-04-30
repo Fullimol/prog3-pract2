@@ -245,7 +245,7 @@ btnAceptar.addEventListener("click", async function (e) {
     try {
         // Realizar la solicitud PUT al servidor                           (!) NO ESTA FUNCIONANDO EL PUT DE LOS DATOS A LA API !!!!!!!!!!!!!!!!!!!
         const response = await fetch(url, {
-            method: "PUT",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
