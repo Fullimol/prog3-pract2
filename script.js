@@ -2,6 +2,7 @@ const containerTabla = document.querySelector('.container-tabla');
 const btnAgregar = document.getElementById("btnAgregar");
 const containerForm = document.querySelector('.container-form');
 const textoForm = document.getElementById("texto-form")
+const btnAceptarForm = document.getElementById("btnAceptarForm");
 const btnAceptar = document.getElementById("btnAceptar");
 const btnCancelar = document.getElementById("btnCancelar");
 const spinner = document.getElementById("spinner");
@@ -26,7 +27,7 @@ const labelProfesional = document.getElementById('label-profesional');
 
 
 
-// OBTENER DATA de la API
+//    ************* OBTENER DATA DE LA API *************
 const url = "https://examenesutn.vercel.app/api/PersonasFutbolistasProfesionales"
 let arrayPersonas = [];
 
@@ -64,8 +65,8 @@ function instanciarPersonas(data) {
         }
     });
 }
+//    ************* FIN OBTENER DATA DE LA API *************
 
-obtenerDatos();
 
 
 //    ************* CREAR CLASES *************
@@ -84,33 +85,32 @@ class Persona {
 
 
 class Futbolista extends Persona {
-    constructor(id, nombre, apellido, edad, equipo, posicion, goles) {
+    constructor(id, nombre, apellido, edad, equipo, posicion, cantidadGoles) {
         super(id, nombre, apellido, edad);
         this.equipo = equipo;
         this.posicion = posicion;
-        this.goles = goles;
+        this.cantidadGoles = cantidadGoles;
     }
 
     toString() {
-        return `$ID: ${this.id}, Nombre: ${this.nombre}, Apellido: ${this.apellido}, Edad: ${this.edad}, Equipo: ${this.equipo}, Posición: ${this.posicion}, Goles: ${this.goles}`;
+        return `$ID: ${this.id}, Nombre: ${this.nombre}, Apellido: ${this.apellido}, Edad: ${this.edad}, Equipo: ${this.equipo}, Posición: ${this.posicion}, cantidadGoles: ${this.cantidadGoles}`;
     }
 }
 
 
 class Profesional extends Persona {
-    constructor(id, nombre, apellido, edad, titulo, facultad, graduacion) {
+    constructor(id, nombre, apellido, edad, titulo, facultad, añoGraduacion) {
         super(id, nombre, apellido, edad);
         this.titulo = titulo;
         this.facultad = facultad;
-        this.graduacion = graduacion;
+        this.añoGraduacion = añoGraduacion;
     }
     toString() {
-        return `ID: ${this.id}, Nombre: ${this.nombre}, Apellido: ${this.apellido}, Edad: ${this.edad}, Título: ${this.titulo}, Facultad: ${this.facultad}, Graduación: ${this.graduacion}`;
+        return `ID: ${this.id}, Nombre: ${this.nombre}, Apellido: ${this.apellido}, Edad: ${this.edad}, Título: ${this.titulo}, Facultad: ${this.facultad}, Graduación: ${this.añoGraduacion}`;
     }
 }
 
-
-// MOSTRAR TABLA O MOSTRAR FORMULARIO
+// --
 function showVistaTabla(mostrar) {
     if (mostrar) {
         containerTabla.classList.remove('hidden');
@@ -128,6 +128,22 @@ function showSpinner(mostrar) {
         spinner.classList.add('hidden');
     }
 }
+
+function limpiarInputs() {
+    inputNombre.value = '';
+    inputApellido.value = '';
+    inputEdad.value = '';
+    inputEquipo.value = '';
+    inputPosicion.value = '';
+    inputCantGoles.value = '';
+    inputTituloUni.value = '';
+    inputFacultad.value = '';
+    inputAnioGradu.value = '';
+
+    labelFutbolista.classList.remove('hidden');
+    labelProfesional.classList.remove('hidden');
+}
+// --
 
 
 //    ************* AGREGAR ELEMENTO *************
@@ -147,16 +163,14 @@ btnAgregar.addEventListener("click", function () {
         return;
     }
 
+    btnAceptar.classList.remove('hidden');
+    btnAceptarForm.classList.add('hidden');
     showVistaTabla(false);
     textoForm.innerHTML = "(ALTA ELEMENTO " + tipoPersona + ")";
     console.log("Agregando elemento...");
     console.log("Tipo de elemento:", tipoPersona);
 });
-
-function agregarElemento(tipoElemento) {
-    //mostrar únicamente los campos correspondientes al tipo de elemento que se está insertando.
-
-}
+//    ************* FIN AGREGAR ELEMENTO *************
 
 
 //  ************* MOSTRAR TABLA *************
@@ -191,10 +205,10 @@ function mostrarTablaPersonas(arrayPersonas) {
     // Agregar el nuevo <tbody> a la tabla
     tabla.appendChild(cuerpo);
 }
+//  ************* FIN MOSTRAR TABLA *************
 
 
-/// (!)   TENGO QUE TOMAR SI SE SUBE UN ELEMENTO PERSONA O PROFESIONAL, LUEGO EL PULL:  (PUNTO 4)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+// ************* AGREGAR ELEMENTO *************
 btnAceptar.addEventListener("click", async function (e) {
     e.preventDefault();
     showSpinner(true);
@@ -230,7 +244,7 @@ btnAceptar.addEventListener("click", async function (e) {
 
     try {
         // Realizar la solicitud PUT al servidor                           (!) NO ESTA FUNCIONANDO EL PUT DE LOS DATOS A LA API !!!!!!!!!!!!!!!!!!!
-        const response = await fetch("https://examenesutn.vercel.app/api/PersonasFutbolistasProfesionales", {
+        const response = await fetch(url, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -263,26 +277,115 @@ btnAceptar.addEventListener("click", async function (e) {
         showSpinner(false);
     }
 });
+// ************* FIN AGREGAR ELEMENTO *************
 
+// ************* ELIMINAR ELEMENTO *************
 btnCancelar.addEventListener("click", function () {
     limpiarInputs();
     showVistaTabla(true);
 });
+// ************* FIN ELIMINAR ELEMENTO *************
 
-function limpiarInputs() {
-    inputNombre.value = '';
-    inputApellido.value = '';
-    inputEdad.value = '';
-    inputEquipo.value = '';
-    inputPosicion.value = '';
-    inputCantGoles.value = '';
-    inputTituloUni.value = '';
-    inputFacultad.value = '';
-    inputAnioGradu.value = '';
+// ************* MODIFICAR ELEMENTO *************
+// Agregar el evento al contenedor de la tabla (delegación de eventos)
+cuerpo.addEventListener("click", function (e) {
+    // Verificar si el clic fue en un botón "Modificar"
+    if (e.target && e.target.id === "btnModificar") {
+        // Obtener la fila donde se hizo clic
+        const fila = e.target.closest("tr");
 
-    labelFutbolista.classList.remove('hidden');
-    labelProfesional.classList.remove('hidden');
-}
+        btnAceptar.classList.add('hidden');
+        btnAceptarForm.classList.remove('hidden');
+
+        // Obtener los datos de las celdas de la fila
+        const id = fila.querySelector(".col-id").textContent.trim();
+        const nombre = fila.querySelector(".col-nombre").textContent.trim();
+        const apellido = fila.querySelector(".col-apellido").textContent.trim();
+        const edad = fila.querySelector(".col-edad").textContent.trim();
+        const equipo = fila.querySelector(".col-equipo").textContent.trim();
+        const posicion = fila.querySelector(".col-posicion").textContent.trim();
+        const cantidadGoles = fila.querySelector(".col-cantGoles").textContent.trim();
+        const titulo = fila.querySelector(".col-titulo").textContent.trim();
+        const facultad = fila.querySelector(".col-facultad").textContent.trim();
+        const añoGraduacion = fila.querySelector(".col-añoGraduacion").textContent.trim();
+
+        // Función para asignar valores y deshabilitar si están vacíos
+        const setInputValue = (inputId, value) => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.value = value !== "-" ? value : "";
+                if (value === "-") {
+                    input.disabled = true; // Deshabilitar el input si el valor es "-"
+                    // input.classList.add('hidden');
+                } else {
+                    input.disabled = false; // Habilitar el input si tiene un valor válido
+                }
+            } else {
+                console.error(`El input con ID "${inputId}" no existe en el DOM`);
+            }
+        };
+
+        setInputValue('input-id', id);
+        setInputValue('input-nombre', nombre);
+        setInputValue('input-apellido', apellido);
+        setInputValue('input-edad', edad);
+        setInputValue('input-equipo', equipo);
+        setInputValue('input-posicion', posicion);
+        setInputValue('input-cantGoles', cantidadGoles);
+        setInputValue('input-tituloUni', titulo);
+        setInputValue('input-facultad', facultad);
+        setInputValue('input-anioGrad', añoGraduacion);
+
+
+        textoForm.innerHTML = "(MODIFICAR ELEMENTO)";
+        showVistaTabla(false);
+
+        // Guardar el ID del elemento que se está modificando (puedes usar un atributo oculto o una variable global)
+        btnAceptarForm.setAttribute("data-id-modificar", id);
+    }
+});
+
+btnAceptarForm.addEventListener("click", async function (e) {
+    e.preventDefault();
+    showSpinner(true);
+
+    // Obtener el ID del elemento que se está modificando
+    const idModificar = btnAceptarForm.getAttribute("data-id-modificar");
+
+    // Crear el objeto con los datos actuales de los inputs
+    const elementoModificado = {
+        nombre: inputNombre.value.trim(),
+        apellido: inputApellido.value.trim(),
+        edad: parseInt(inputEdad.value),
+        equipo: inputEquipo.value.trim(),
+        posicion: inputPosicion.value.trim(),
+        cantidadGoles: parseInt(inputCantGoles.value),
+        titulo: inputTituloUni.value.trim(),
+        facultad: inputFacultad.value.trim(),
+        anioGraduacion: parseInt(inputAnioGradu.value)
+    };
+
+    // Eliminar claves con valores inválidos (sino me iba a guardar las claves vacias)
+    Object.keys(elementoModificado).forEach(key => {
+        if (!elementoModificado[key] && elementoModificado[key] !== 0) {
+            delete elementoModificado[key];
+        }
+    });
+
+    console.log("Modificando el elemento con ID:", idModificar);
+    console.log("Datos enviados al servidor:", elementoModificado);
+    showSpinner(false);
+
+
+    ///     (!)       ACA TENGO QUE PONER LA CONECEXION A LA API PARA ACTUALIZARLO.
+});
+// ************* FIN MODIFICAR ELEMENTO *************
+
+
+
+
+
+obtenerDatos();
 
 function inicializarApp() {
     console.log("Inicializando la aplicación con los datos:", arrayPersonas);
