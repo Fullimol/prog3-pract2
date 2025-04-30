@@ -245,7 +245,7 @@ btnAceptar.addEventListener("click", async function (e) {
     try {
         // Realizar la solicitud PUT al servidor                           (!) NO ESTA FUNCIONANDO EL PUT DE LOS DATOS A LA API !!!!!!!!!!!!!!!!!!!
         const response = await fetch(url, {
-            method: "PUT",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -260,8 +260,9 @@ btnAceptar.addEventListener("click", async function (e) {
             console.log("Elemento agregado:", elementoGuardado);
 
             // Actualizar el array local con el nuevo elemento
-            arrayPersonas.push(elementoGuardado);
-
+            arrayPersonas.push({...nuevoElemento, id: elementoGuardado.id}); // agrego el id que me devuelve la API y lo agrego a la nueva persona
+            console.log("Nuevo array de personas:", arrayPersonas);
+            
             mostrarTablaPersonas(arrayPersonas);
             showVistaTabla(true);
             // limpiarInputs();
