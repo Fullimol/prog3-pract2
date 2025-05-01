@@ -243,7 +243,6 @@ btnAceptar.addEventListener("click", async function (e) {
     console.log("Enviando el siguiente objeto al servidor:", nuevoElemento);
 
     try {
-        // Realizar la solicitud PUT al servidor                           (!) NO ESTA FUNCIONANDO EL PUT DE LOS DATOS A LA API !!!!!!!!!!!!!!!!!!!
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -260,9 +259,9 @@ btnAceptar.addEventListener("click", async function (e) {
             console.log("Elemento agregado:", elementoGuardado);
 
             // Actualizar el array local con el nuevo elemento
-            arrayPersonas.push({...nuevoElemento, id: elementoGuardado.id}); // agrego el id que me devuelve la API y lo agrego a la nueva persona
+            arrayPersonas.push({ ...nuevoElemento, id: elementoGuardado.id }); // agrego el id que me devuelve la API y lo agrego a la nueva persona
             console.log("Nuevo array de personas:", arrayPersonas);
-            
+
             mostrarTablaPersonas(arrayPersonas);
             showVistaTabla(true);
             // limpiarInputs();
@@ -363,7 +362,7 @@ btnAceptarForm.addEventListener("click", async function (e) {
         cantidadGoles: parseInt(inputCantGoles.value),
         titulo: inputTituloUni.value.trim(),
         facultad: inputFacultad.value.trim(),
-        anioGraduacion: parseInt(inputAnioGradu.value)
+        añoGraduacion: parseInt(inputAnioGradu.value)
     };
 
     // Eliminar claves con valores inválidos (sino me iba a guardar las claves vacias)
@@ -375,10 +374,41 @@ btnAceptarForm.addEventListener("click", async function (e) {
 
     console.log("Modificando el elemento con ID:", idModificar);
     console.log("Datos enviados al servidor:", elementoModificado);
-    showSpinner(false);
 
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(elementoModificado), // Convertir el objeto a JSON
+        });
 
-    ///     (!)       ACA TENGO QUE PONER LA CONECEXION A LA API PARA ACTUALIZARLO.
+        if (response.status === 200) {
+            const elementoActualizado = await response.json(); // Recibir el objeto actualizado
+            console.log("Elemento modificado:", elementoActualizado);
+
+            // Actualizar el array local con el nuevo elemento
+            const index = arrayPersonas.findIndex(persona => persona.id == idModificar);
+            if (index !== -1) {
+                arrayPersonas[index] = { ...arrayPersonas[index], ...elementoModificado }; // Actualizar el objeto en el array
+                console.log("Nuevo array de personas:", arrayPersonas);
+                mostrarTablaPersonas(arrayPersonas);
+                showVistaTabla(true);
+                limpiarInputs();
+            } else {
+                alert("Elemento no encontrado en el array local.");
+            }
+        } else {
+            const errorText = await response.text();
+            console.error("Error del servidor:", errorText);
+            alert("Error al modificar el elemento. Código de respuesta: " + response.status + "\n" + errorText);
+        }
+    } catch (error) {
+        alert("Error al conectar con la API: " + error.message);
+    } finally {
+        showSpinner(false);
+    }
 });
 // ************* FIN MODIFICAR ELEMENTO *************
 
