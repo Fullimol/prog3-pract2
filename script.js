@@ -355,6 +355,7 @@ btnAceptarForm.addEventListener("click", async function (e) {
 
     // Crear el objeto con los datos actuales de los inputs
     const elementoModificado = {
+        id: idModificar,
         nombre: inputNombre.value.trim(),
         apellido: inputApellido.value.trim(),
         edad: parseInt(inputEdad.value),
@@ -363,7 +364,7 @@ btnAceptarForm.addEventListener("click", async function (e) {
         cantidadGoles: parseInt(inputCantGoles.value),
         titulo: inputTituloUni.value.trim(),
         facultad: inputFacultad.value.trim(),
-        anioGraduacion: parseInt(inputAnioGradu.value)
+        añoGraduacion: parseInt(inputAnioGradu.value)
     };
 
     // Eliminar claves con valores inválidos (sino me iba a guardar las claves vacias)
@@ -379,6 +380,15 @@ btnAceptarForm.addEventListener("click", async function (e) {
 
 
     ///     (!)       ACA TENGO QUE PONER LA CONECEXION A LA API PARA ACTUALIZARLO.
+    const subirElemento = await fetch(url,{
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(elementoModificado),
+    })
+    const response = await subirElemento.text();
+    console.log(response); 
 });
 // ************* FIN MODIFICAR ELEMENTO *************
 
