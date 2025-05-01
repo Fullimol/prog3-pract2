@@ -2,8 +2,9 @@ const containerTabla = document.querySelector('.container-tabla');
 const btnAgregar = document.getElementById("btnAgregar");
 const containerForm = document.querySelector('.container-form');
 const textoForm = document.getElementById("texto-form")
-const btnAceptarForm = document.getElementById("btnAceptarForm");
-const btnAceptar = document.getElementById("btnAceptar");
+const btnAceptarCambio = document.getElementById("btnAceptarCambio");
+const btnAceptarNuevo = document.getElementById("btnAceptarNuevo");
+const btnAceptarEliminar = document.getElementById("btnAceptarEliminar");
 const btnCancelar = document.getElementById("btnCancelar");
 const spinner = document.getElementById("spinner");
 const tabla = document.getElementById('tablaPersonas');
@@ -83,7 +84,6 @@ class Persona {
     }
 }
 
-
 class Futbolista extends Persona {
     constructor(id, nombre, apellido, edad, equipo, posicion, cantidadGoles) {
         super(id, nombre, apellido, edad);
@@ -96,7 +96,6 @@ class Futbolista extends Persona {
         return `$ID: ${this.id}, Nombre: ${this.nombre}, Apellido: ${this.apellido}, Edad: ${this.edad}, Equipo: ${this.equipo}, Posición: ${this.posicion}, cantidadGoles: ${this.cantidadGoles}`;
     }
 }
-
 
 class Profesional extends Persona {
     constructor(id, nombre, apellido, edad, titulo, facultad, añoGraduacion) {
@@ -140,38 +139,37 @@ function limpiarInputs() {
     inputFacultad.value = '';
     inputAnioGradu.value = '';
 
+    // Habilitar todos los campos
+    inputNombre.disabled = false;
+    inputApellido.disabled = false;
+    inputEdad.disabled = false;
+    inputEquipo.disabled = false;
+    inputPosicion.disabled = false;
+    inputCantGoles.disabled = false;
+    inputTituloUni.disabled = false;
+    inputFacultad.disabled = false;
+    inputAnioGradu.disabled = false;
+
     labelFutbolista.classList.remove('hidden');
     labelProfesional.classList.remove('hidden');
 }
-// --
 
-
-//    ************* AGREGAR ELEMENTO *************
-btnAgregar.addEventListener("click", function () {
-    let tipoPersona = prompt("¿Qué tipo de elemento desea agregar? (futbolista/profesional)").toLowerCase();
-    if (tipoPersona === "futbolista") {
-        labelProfesional.classList.add('hidden');
-        // Guardar el tipo de persona en un atributo del botón "Alta"
-        btnAceptar.setAttribute('data-tipo-persona', 'futbolista');
-    } else if (tipoPersona === "profesional") {
-        labelFutbolista.classList.add('hidden');
-        // Guardar el tipo de persona en un atributo del botón "Alta"
-        btnAceptar.setAttribute('data-tipo-persona', 'profesional');
+// Función para asignar valores y deshabilitar si están vacíos
+const setInputValue = (inputId, value) => {
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.value = value !== "-" ? value : "";
+        if (value === "-") {
+            input.disabled = true; // Deshabilitar el input si el valor es "-"
+            // input.classList.add('hidden');
+        } else {
+            input.disabled = false; // Habilitar el input si tiene un valor válido
+        }
     } else {
-        alert("Tipo de persona no válido. Por favor, elija 'Futbolista' o 'Profesional'.");
-        btnAgregar.classList.remove('hidden');
-        return;
+        console.error(`El input con ID "${inputId}" no existe en el DOM`);
     }
-
-    btnAceptar.classList.remove('hidden');
-    btnAceptarForm.classList.add('hidden');
-    showVistaTabla(false);
-    textoForm.innerHTML = "(ALTA ELEMENTO " + tipoPersona + ")";
-    console.log("Agregando elemento...");
-    console.log("Tipo de elemento:", tipoPersona);
-});
-//    ************* FIN AGREGAR ELEMENTO *************
-
+};
+// --
 
 //  ************* MOSTRAR TABLA *************
 function mostrarTablaPersonas(arrayPersonas) {
@@ -207,12 +205,42 @@ function mostrarTablaPersonas(arrayPersonas) {
 }
 //  ************* FIN MOSTRAR TABLA *************
 
+btnCancelar.addEventListener("click", function () {
+    limpiarInputs();
+    showVistaTabla(true);
+});
 
-// ************* AGREGAR ELEMENTO *************
-btnAceptar.addEventListener("click", async function (e) {
+
+//    ************* AGREGAR ELEMENTO *************
+btnAgregar.addEventListener("click", function () {
+    let tipoPersonaPromt = prompt("¿Qué tipo de elemento desea agregar? (futbolista/profesional)").toLowerCase();
+    if (tipoPersonaPromt === "futbolista") {
+        labelProfesional.classList.add('hidden');
+        // Guardar el tipo de persona en un atributo del botón "Alta"
+        btnAceptarNuevo.setAttribute('data-tipo-persona', 'futbolista');
+    } else if (tipoPersonaPromt === "profesional") {
+        labelFutbolista.classList.add('hidden');
+        // Guardar el tipo de persona en un atributo del botón "Alta"
+        btnAceptarNuevo.setAttribute('data-tipo-persona', 'profesional');
+    } else {
+        alert("Tipo de persona no válido. Por favor, elija 'Futbolista' o 'Profesional'.");
+        btnAgregar.classList.remove('hidden');
+        return;
+    }
+
+    btnAceptarNuevo.classList.remove('hidden');
+    btnAceptarEliminar.classList.add('hidden');
+    btnAceptarCambio.classList.add('hidden');
+    showVistaTabla(false);
+    textoForm.innerHTML = "(ALTA ELEMENTO " + tipoPersonaPromt + ")";
+    console.log("Agregando elemento...");
+    console.log("Tipo de elemento:", tipoPersonaPromt);
+});
+
+btnAceptarNuevo.addEventListener("click", async function (e) {
     e.preventDefault();
     showSpinner(true);
-    const tipoElemento = btnAceptar.getAttribute("data-tipo-persona");
+    const tipoElemento = btnAceptarNuevo.getAttribute("data-tipo-persona");
 
     // Crear el objeto con los datos del formulario
     let nuevoElemento;
@@ -264,93 +292,79 @@ btnAceptar.addEventListener("click", async function (e) {
 
             mostrarTablaPersonas(arrayPersonas);
             showVistaTabla(true);
-            // limpiarInputs();
+            limpiarInputs();
         } else {
-            console.log("AAAAAAAAAAAAAAh")
             const errorText = await response.text();
-            console.error("Error del servidor:", errorText);
             alert("Error al agregar el elemento. Código de respuesta: " + response.status + "\n" + errorText);
         }
     } catch (error) {
         alert("Error al conectar con la API: " + error.message);
     } finally {
+        labelProfesional.classList.remove('hidden');
+        labelFutbolista.classList.remove('hidden');
         showSpinner(false);
     }
 });
 // ************* FIN AGREGAR ELEMENTO *************
 
-// ************* ELIMINAR ELEMENTO *************
-btnCancelar.addEventListener("click", function () {
-    limpiarInputs();
-    showVistaTabla(true);
-});
-// ************* FIN ELIMINAR ELEMENTO *************
 
-// ************* MODIFICAR ELEMENTO *************
-// Agregar el evento al contenedor de la tabla (delegación de eventos)
+/*
+Agregar el evento al contenedor de la tabla (delegación de eventos)    (!)    (!)    (!)    (!)
+(con esto evito agregar el evento a cada botón de cada fila de la tabla y tomo el evento con los datos de la fila)
+*/
 cuerpo.addEventListener("click", function (e) {
-    // Verificar si el clic fue en un botón "Modificar"
+    // Verificar si el clic fue en un botón "Modificar" o "Eliminar"
     if (e.target && e.target.id === "btnModificar") {
-        // Obtener la fila donde se hizo clic
-        const fila = e.target.closest("tr");
-
-        btnAceptar.classList.add('hidden');
-        btnAceptarForm.classList.remove('hidden');
-
-        // Obtener los datos de las celdas de la fila
-        const id = fila.querySelector(".col-id").textContent.trim();
-        const nombre = fila.querySelector(".col-nombre").textContent.trim();
-        const apellido = fila.querySelector(".col-apellido").textContent.trim();
-        const edad = fila.querySelector(".col-edad").textContent.trim();
-        const equipo = fila.querySelector(".col-equipo").textContent.trim();
-        const posicion = fila.querySelector(".col-posicion").textContent.trim();
-        const cantidadGoles = fila.querySelector(".col-cantGoles").textContent.trim();
-        const titulo = fila.querySelector(".col-titulo").textContent.trim();
-        const facultad = fila.querySelector(".col-facultad").textContent.trim();
-        const añoGraduacion = fila.querySelector(".col-añoGraduacion").textContent.trim();
-
-        // Función para asignar valores y deshabilitar si están vacíos
-        const setInputValue = (inputId, value) => {
-            const input = document.getElementById(inputId);
-            if (input) {
-                input.value = value !== "-" ? value : "";
-                if (value === "-") {
-                    input.disabled = true; // Deshabilitar el input si el valor es "-"
-                    // input.classList.add('hidden');
-                } else {
-                    input.disabled = false; // Habilitar el input si tiene un valor válido
-                }
-            } else {
-                console.error(`El input con ID "${inputId}" no existe en el DOM`);
-            }
-        };
-
-        setInputValue('input-id', id);
-        setInputValue('input-nombre', nombre);
-        setInputValue('input-apellido', apellido);
-        setInputValue('input-edad', edad);
-        setInputValue('input-equipo', equipo);
-        setInputValue('input-posicion', posicion);
-        setInputValue('input-cantGoles', cantidadGoles);
-        setInputValue('input-tituloUni', titulo);
-        setInputValue('input-facultad', facultad);
-        setInputValue('input-anioGrad', añoGraduacion);
-
-
-        textoForm.innerHTML = "(MODIFICAR ELEMENTO)";
-        showVistaTabla(false);
-
-        // Guardar el ID del elemento que se está modificando (puedes usar un atributo oculto o una variable global)
-        btnAceptarForm.setAttribute("data-id-modificar", id);
+        modificarElemento(e);
+    } else if (e.target && e.target.id === "btnEliminar") {
+        eliminarElemento(e);
     }
 });
 
-btnAceptarForm.addEventListener("click", async function (e) {
+// ************* MODIFICAR ELEMENTO *************
+function modificarElemento(e) {
+    // Obtener la fila donde se hizo clic
+    const fila = e.target.closest("tr");
+
+    // Obtener los datos de las celdas de la fila
+    const id = fila.querySelector(".col-id").textContent.trim();
+    const nombre = fila.querySelector(".col-nombre").textContent.trim();
+    const apellido = fila.querySelector(".col-apellido").textContent.trim();
+    const edad = fila.querySelector(".col-edad").textContent.trim();
+    const equipo = fila.querySelector(".col-equipo").textContent.trim();
+    const posicion = fila.querySelector(".col-posicion").textContent.trim();
+    const cantidadGoles = fila.querySelector(".col-cantGoles").textContent.trim();
+    const titulo = fila.querySelector(".col-titulo").textContent.trim();
+    const facultad = fila.querySelector(".col-facultad").textContent.trim();
+    const añoGraduacion = fila.querySelector(".col-añoGraduacion").textContent.trim();
+
+    setInputValue('input-id', id);
+    setInputValue('input-nombre', nombre);
+    setInputValue('input-apellido', apellido);
+    setInputValue('input-edad', edad);
+    setInputValue('input-equipo', equipo);
+    setInputValue('input-posicion', posicion);
+    setInputValue('input-cantGoles', cantidadGoles);
+    setInputValue('input-tituloUni', titulo);
+    setInputValue('input-facultad', facultad);
+    setInputValue('input-anioGrad', añoGraduacion);
+
+    btnAceptarNuevo.classList.add('hidden');
+    btnAceptarEliminar.classList.add('hidden');
+    btnAceptarCambio.classList.remove('hidden');
+    textoForm.innerHTML = "(MODIFICAR ELEMENTO)";
+    showVistaTabla(false);
+
+    // Guardar el ID del elemento que se está modificando (puedes usar un atributo oculto o una variable global)
+    btnAceptarCambio.setAttribute("data-id-modificar", id);
+}
+
+btnAceptarCambio.addEventListener("click", async function (e) {
     e.preventDefault();
     showSpinner(true);
 
     // Obtener el ID del elemento que se está modificando
-    const idModificar = btnAceptarForm.getAttribute("data-id-modificar");
+    const idModificar = btnAceptarCambio.getAttribute("data-id-modificar");
 
     // Crear el objeto con los datos actuales de los inputs
     const elementoModificado = {
@@ -403,6 +417,7 @@ btnAceptarForm.addEventListener("click", async function (e) {
             const errorText = await response.text();
             console.error("Error del servidor:", errorText);
             alert("Error al modificar el elemento. Código de respuesta: " + response.status + "\n" + errorText);
+            showVistaTabla(true);
         }
     } catch (error) {
         alert("Error al conectar con la API: " + error.message);
@@ -411,6 +426,95 @@ btnAceptarForm.addEventListener("click", async function (e) {
     }
 });
 // ************* FIN MODIFICAR ELEMENTO *************
+
+// ************* ELIMINAR ELEMENTO *************
+function eliminarElemento(e) {
+    // Obtener la fila donde se hizo clic
+    const fila = e.target.closest("tr");
+
+    // Obtener los datos de las celdas de la fila
+    const id = fila.querySelector(".col-id").textContent.trim();
+    const nombre = fila.querySelector(".col-nombre").textContent.trim();
+    const apellido = fila.querySelector(".col-apellido").textContent.trim();
+    const edad = fila.querySelector(".col-edad").textContent.trim();
+    const equipo = fila.querySelector(".col-equipo").textContent.trim();
+    const posicion = fila.querySelector(".col-posicion").textContent.trim();
+    const cantidadGoles = fila.querySelector(".col-cantGoles").textContent.trim();
+    const titulo = fila.querySelector(".col-titulo").textContent.trim();
+    const facultad = fila.querySelector(".col-facultad").textContent.trim();
+    const añoGraduacion = fila.querySelector(".col-añoGraduacion").textContent.trim();
+
+    setInputValue('input-id', id);
+    setInputValue('input-nombre', nombre);
+    setInputValue('input-apellido', apellido);
+    setInputValue('input-edad', edad);
+    setInputValue('input-equipo', equipo);
+    setInputValue('input-posicion', posicion);
+    setInputValue('input-cantGoles', cantidadGoles);
+    setInputValue('input-tituloUni', titulo);
+    setInputValue('input-facultad', facultad);
+    setInputValue('input-anioGrad', añoGraduacion);
+
+    inputNombre.disabled = true;
+    inputApellido.disabled = true;
+    inputEdad.disabled = true;
+    inputEquipo.disabled = true;
+    inputPosicion.disabled = true;
+    inputCantGoles.disabled = true;
+    inputTituloUni.disabled = true;
+    inputFacultad.disabled = true;
+    inputAnioGradu.disabled = true;
+
+
+    btnAceptarEliminar.classList.remove('hidden');
+    btnAceptarNuevo.classList.add('hidden');
+    btnAceptarCambio.classList.add('hidden');
+    textoForm.innerHTML = "(ELIMINAR ELEMENTO) ID: " + id;
+    showVistaTabla(false);
+
+    // Guardar el ID del elemento que se está Eliminando (puedes usar un atributo oculto o una variable global)
+    btnAceptarEliminar.setAttribute("data-id-eliminar", id);
+}
+
+btnAceptarEliminar.addEventListener("click", async function (e) {
+    e.preventDefault();
+    showSpinner(true);
+
+    // Obtener el ID del elemento que se está eliminando
+    const idEliminar = btnAceptarEliminar.getAttribute("data-id-eliminar");
+
+    console.log("Eliminando el elemento con ID:", idEliminar);
+
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: idEliminar }), // Convertir el objeto a JSON
+        });
+
+        if (response.status === 200) {
+            console.log("Elemento eliminado con éxito.");
+
+            // Actualizar el array local eliminando el elemento
+            arrayPersonas = arrayPersonas.filter(persona => persona.id != idEliminar); // Filtrar el array para eliminar el elemento
+            console.log("Nuevo array de personas:", arrayPersonas);
+            mostrarTablaPersonas(arrayPersonas);
+            showVistaTabla(true);
+            limpiarInputs();
+        } else {
+            const errorText = await response.text();
+            alert("Error al eliminar el elemento. Código de respuesta: " + response.status + "\n" + errorText);
+        }
+    } catch (error) {
+        alert("Error al conectar con la API: " + error.message);
+    } finally {
+        btnAceptarEliminar.classList.add('hidden');
+        showSpinner(false);
+    }
+});
+// ************* FIN ELIMINAR ELEMENTO *************
 
 
 
