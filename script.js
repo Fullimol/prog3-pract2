@@ -313,8 +313,6 @@ btnAceptarNuevo.addEventListener("click", async function (e) {
         }
     });
 
-
-
     //*** VALIDACION de los inputs */
     let errores = [];
     if (!inputNombre.value) errores.push("El nombre es obligatorio.");
@@ -343,7 +341,7 @@ btnAceptarNuevo.addEventListener("click", async function (e) {
         }
     }
 
-    console.log("Enviando el siguiente objeto al servidor:", nuevoElemento);
+    console.log("Objeto a crear:", nuevoElemento);
 
     if (errores.length > 0) {
         alert("ERRORES ENCONTRADOS:\n" + errores.join("\n"));
