@@ -110,6 +110,54 @@ class Profesional extends Persona {
 }
 
 // --
+//recibo el nombre del input y pido los requisitos para guardarlo
+function validarInput(inputName, valor, tipoPersona) {
+    let mensaje = "";
+
+    // Validaciones generales
+    if (inputName === 'input-nombre' && valor === '') {
+        mensaje = "El nombre no puede estar vacío";
+    } else if (inputName === 'input-apellido' && valor === '') {
+        mensaje = "El apellido no puede estar vacío";
+    } else if (inputName === 'input-edad') {
+        if (valor === '') {
+            mensaje = "La edad no puede estar vacía";
+        } else if (valor <= 15) {
+            mensaje = "La edad debe ser mayor a 15";
+        }
+    }
+
+    // Validaciones específicas según la instancia
+    if (tipoPersona === "futbolista") {
+        if (inputName === 'input-equipo' && valor === '') {
+            mensaje = "El equipo no puede estar vacío";
+        } else if (inputName === 'input-posicion' && valor === '') {
+            mensaje = "La posición no puede estar vacía";
+        } else if (inputName === 'input-cantGoles') {
+            if (valor === '') {
+                mensaje = "La cantidad de goles no puede estar vacía";
+            } else if (valor < 0) {
+                mensaje = "La cantidad de goles debe ser mayor o igual a 0";
+            }
+        }
+    } else if (tipoPersona === "profesional") {
+        if (inputName === 'input-tituloUni' && valor === '') {
+            mensaje = "El título no puede estar vacío";
+        } else if (inputName === 'input-facultad' && valor === '') {
+            mensaje = "La facultad no puede estar vacía";
+        } else if (inputName === 'input-anioGrad') {
+            if (valor === '') {
+                mensaje = "El año de graduación no puede estar vacío";
+            } else if (valor < 1950) {
+                mensaje = "El año de graduación debe ser mayor a 1950";
+            }
+        }
+    }
+
+    return mensaje;
+}
+
+
 function showVistaTabla(mostrar) {
     if (mostrar) {
         containerTabla.classList.remove('hidden');
@@ -154,13 +202,13 @@ function limpiarInputs() {
     labelProfesional.classList.remove('hidden');
 }
 
-// Función para asignar valores y deshabilitar si están vacíos
-const setInputValue = (inputId, value) => {
+// Función para asignar valores a los inputs y deshabilitar si están vacíos
+function setInputValue(inputId, value) {
     const input = document.getElementById(inputId);
     if (input) {
-        input.value = value !== "-" ? value : "";
-        if (value === "-") {
-            input.disabled = true; // Deshabilitar el input si el valor es "-"
+        input.value = value !== "N/A" ? value : "";
+        if (value === "N/A") {
+            input.disabled = true; // Deshabilitar el input si el valor es "N/A"
             // input.classList.add('hidden');
         } else {
             input.disabled = false; // Habilitar el input si tiene un valor válido
@@ -170,6 +218,13 @@ const setInputValue = (inputId, value) => {
     }
 };
 // --
+
+btnCancelar.addEventListener("click", function () {
+    limpiarInputs();
+    showVistaTabla(true);
+});
+
+
 
 //  ************* MOSTRAR TABLA *************
 function mostrarTablaPersonas(arrayPersonas) {
@@ -183,12 +238,12 @@ function mostrarTablaPersonas(arrayPersonas) {
             <td class="col-nombre">${persona.nombre}</td>
             <td class="col-apellido">${persona.apellido}</td>
             <td class="col-edad">${persona.edad}</td>
-            <td class="col-equipo">${'equipo' in persona ? persona.equipo : '-'}</td>
-            <td class="col-posicion">${'posicion' in persona ? persona.posicion : '-'}</td>
-            <td class="col-cantGoles">${'cantidadGoles' in persona ? persona.cantidadGoles : '-'}</td>
-            <td class="col-titulo">${'titulo' in persona ? persona.titulo : '-'}</td>
-            <td class="col-facultad">${'facultad' in persona ? persona.facultad : '-'}</td>
-            <td class="col-añoGraduacion">${'añoGraduacion' in persona ? persona.añoGraduacion : '-'}</td>
+            <td class="col-equipo">${'equipo' in persona ? persona.equipo : 'N/A'}</td>
+            <td class="col-posicion">${'posicion' in persona ? persona.posicion : 'N/A'}</td>
+            <td class="col-cantGoles">${'cantidadGoles' in persona ? persona.cantidadGoles : 'N/A'}</td>
+            <td class="col-titulo">${'titulo' in persona ? persona.titulo : 'N/A'}</td>
+            <td class="col-facultad">${'facultad' in persona ? persona.facultad : 'N/A'}</td>
+            <td class="col-añoGraduacion">${'añoGraduacion' in persona ? persona.añoGraduacion : 'N/A'}</td>
             <td class="col-acciones">
                 <button type="button" id="btnModificar">Modificar</button>
             </td>
@@ -205,10 +260,6 @@ function mostrarTablaPersonas(arrayPersonas) {
 }
 //  ************* FIN MOSTRAR TABLA *************
 
-btnCancelar.addEventListener("click", function () {
-    limpiarInputs();
-    showVistaTabla(true);
-});
 
 
 //    ************* AGREGAR ELEMENTO *************
@@ -243,69 +294,100 @@ btnAceptarNuevo.addEventListener("click", async function (e) {
     const tipoElemento = btnAceptarNuevo.getAttribute("data-tipo-persona");
 
     // Crear el objeto con los datos del formulario
-    let nuevoElemento;
-    if (tipoElemento === "futbolista") {
-        nuevoElemento = {
-            nombre: inputNombre.value,
-            apellido: inputApellido.value,
-            edad: parseInt(inputEdad.value),
-            equipo: inputEquipo.value,
-            posicion: inputPosicion.value,
-            cantidadGoles: parseInt(inputCantGoles.value),
-        };
-    } else if (tipoElemento === "profesional") {
-        nuevoElemento = {
-            nombre: inputNombre.value,
-            apellido: inputApellido.value,
-            edad: parseInt(inputEdad.value),
-            titulo: inputTituloUni.value,
-            facultad: inputFacultad.value,
-            añoGraduacion: parseInt(inputAnioGradu.value),
-        };
+    let nuevoElemento = {
+        nombre: inputNombre.value,
+        apellido: inputApellido.value,
+        edad: parseInt(inputEdad.value),
+        equipo: inputEquipo.value,
+        posicion: inputPosicion.value,
+        cantidadGoles: parseInt(inputCantGoles.value),
+        titulo: inputTituloUni.value,
+        facultad: inputFacultad.value,
+        añoGraduacion: parseInt(inputAnioGradu.value),
+    };
 
-    } else {
-        alert("Tipo de elemento no válido.");
-        showSpinner(false);
-        return;
+    //  eliminar claves con valores inválidos (para evitar guardar vacíos, osea el tipo de persona que NO esta seleccionado)
+    Object.keys(nuevoElemento).forEach(key => {
+        if (!nuevoElemento[key] && nuevoElemento[key] !== 0) {
+            delete nuevoElemento[key];
+        }
+    });
+
+
+
+    //*** VALIDACION de los inputs */
+    let errores = [];
+    if (!inputNombre.value) errores.push("El nombre es obligatorio.");
+    if (!inputApellido.value) errores.push("El apellido es obligatorio.");
+    if (inputEdad.value === "") {
+        errores.push("La edad no puede estar vacía.");
+    } else if (isNaN(inputEdad.value) || inputEdad.value <= 15) {
+        errores.push("La edad debe ser un número mayot a 15");
     }
+    if (tipoElemento === "futbolista") {
+        if (!inputEquipo.value.trim()) errores.push("El equipo es obligatorio para futbolistas.");
+        if (!inputPosicion.value.trim()) errores.push("La posición es obligatoria para futbolistas.");
+        if (inputCantGoles.value.trim() === "") {
+            errores.push("Los goles no pueden estar vacíos.");
+        } else if (isNaN(inputCantGoles.value) || inputCantGoles.value < 0) {
+            errores.push("Los goles deben ser un número mayor o igual a 0.");
+        }
+    }
+    if (tipoElemento === "profesional") {
+        if (!inputTituloUni.value.trim()) errores.push("El título es obligatorio para profesionales.");
+        if (!inputFacultad.value.trim()) errores.push("La facultad es obligatoria para profesionales.");
+        if (inputAnioGradu.value.trim() === "") {
+            errores.push("El año de graduación no puede estar vacío.");
+        } else if (isNaN(inputAnioGradu.value) || inputAnioGradu.value < 1950) {
+            errores.push("El año de graduación debe ser válido y mayor a 1950.");
+        }
+    }
+
     console.log("Enviando el siguiente objeto al servidor:", nuevoElemento);
 
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(nuevoElemento), // Convertir el objeto a JSON
-
-        });
-        console.log("OBJETO A ENVIAR!!!!:", JSON.stringify(nuevoElemento, null, 2));
-
-
-        if (response.status === 200) {
-            const elementoGuardado = await response.json(); // Recibir el objeto con el ID generado
-            console.log("Elemento agregado:", elementoGuardado);
-
-            // Actualizar el array local con el nuevo elemento
-            arrayPersonas.push({ ...nuevoElemento, id: elementoGuardado.id }); // agrego el id que me devuelve la API y lo agrego a la nueva persona
-            console.log("Nuevo array de personas:", arrayPersonas);
-
-            mostrarTablaPersonas(arrayPersonas);
-            showVistaTabla(true);
-            limpiarInputs();
-        } else {
-            const errorText = await response.text();
-            alert("Error al agregar el elemento. Código de respuesta: " + response.status + "\n" + errorText);
-        }
-    } catch (error) {
-        alert("Error al conectar con la API: " + error.message);
-    } finally {
-        labelProfesional.classList.remove('hidden');
-        labelFutbolista.classList.remove('hidden');
+    if (errores.length > 0) {
+        alert("ERRORES ENCONTRADOS:\n" + errores.join("\n"));
         showSpinner(false);
+        return;
+    } else {
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(nuevoElemento), // Convertir el objeto a JSON
+
+            });
+            console.log("Validacion exitosa. OBJETO A ENVIAR!!!!:", JSON.stringify(nuevoElemento, null, 2));
+
+
+            if (response.status === 200) {
+                const elementoGuardado = await response.json(); // Recibir el objeto con el ID generado
+                console.log("Elemento agregado:", elementoGuardado);
+
+                // Actualizar el array local con el nuevo elemento
+                arrayPersonas.push({ ...nuevoElemento, id: elementoGuardado.id }); // agrego el id que me devuelve la API y lo agrego a la nueva persona
+                console.log("Nuevo array de personas:", arrayPersonas);
+
+                mostrarTablaPersonas(arrayPersonas);
+                showVistaTabla(true);
+                limpiarInputs();
+            } else {
+                const errorText = await response.text();
+                alert("Error al agregar el elemento. Código de respuesta: " + response.status + "\n" + errorText);
+            }
+        } catch (error) {
+            alert("Error al conectar con la API: " + error.message);
+        } finally {
+            labelProfesional.classList.remove('hidden');
+            labelFutbolista.classList.remove('hidden');
+            showSpinner(false);
+        }
     }
 });
 // ************* FIN AGREGAR ELEMENTO *************
+
 
 
 /*
@@ -365,6 +447,7 @@ btnAceptarCambio.addEventListener("click", async function (e) {
 
     // Obtener el ID del elemento que se está modificando
     const idModificar = btnAceptarCambio.getAttribute("data-id-modificar");
+    console.log("Modificando el elemento con ID:", idModificar);
 
     // Crear el objeto con los datos actuales de los inputs
     const elementoModificado = {
@@ -379,53 +462,90 @@ btnAceptarCambio.addEventListener("click", async function (e) {
         añoGraduacion: parseInt(inputAnioGradu.value)
     };
 
-    // Eliminar claves con valores inválidos (sino me iba a guardar las claves vacias)
+    //  eliminar claves con valores inválidos (para evitar guardar vacíos)
     Object.keys(elementoModificado).forEach(key => {
         if (!elementoModificado[key] && elementoModificado[key] !== 0) {
             delete elementoModificado[key];
         }
     });
 
-    console.log("Modificando el elemento con ID:", idModificar);
-    console.log("Datos enviados al servidor:", elementoModificado);
 
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(elementoModificado), // Convertir el objeto a JSON
-        });
+    //*** VALIDACION de los inputs */
+    let errores = [];
+    if (!inputNombre.value) errores.push("El nombre es obligatorio.");
+    if (!inputApellido.value) errores.push("El apellido es obligatorio.");
+    if (inputEdad.value === "") {
+        errores.push("La edad no puede estar vacía.");
+    } else if (isNaN(inputEdad.value) || inputEdad.value < 15) {
+        errores.push("La edad debe ser un número mayot a 15");
+    }
+    // Validaciones específicas para futbolista
+    if (inputEquipo.value || inputPosicion.value || inputCantGoles.value) {
+        if (!inputEquipo.value) errores.push("El equipo es obligatorio para futbolistas.");
+        if (!inputPosicion.value) errores.push("La posición es obligatoria para futbolistas.");
 
-        if (response.status === 200) {
-            const elementoActualizado = await response.json(); // Recibir el objeto actualizado
-            console.log("Elemento modificado:", elementoActualizado);
-
-            // Actualizar el array local con el nuevo elemento
-            const index = arrayPersonas.findIndex(persona => persona.id == idModificar);
-            if (index !== -1) {
-                arrayPersonas[index] = { ...arrayPersonas[index], ...elementoModificado }; // Actualizar el objeto en el array
-                console.log("Nuevo array de personas:", arrayPersonas);
-                mostrarTablaPersonas(arrayPersonas);
-                showVistaTabla(true);
-                limpiarInputs();
-            } else {
-                alert("Elemento no encontrado en el array local.");
-            }
-        } else {
-            const errorText = await response.text();
-            console.error("Error del servidor:", errorText);
-            alert("Error al modificar el elemento. Código de respuesta: " + response.status + "\n" + errorText);
-            showVistaTabla(true);
+        if (inputCantGoles.value === "") {
+            errores.push("Los goles no pueden estar vacíos.");
+        } else if (isNaN(inputCantGoles.value) || inputCantGoles.value < 0) {
+            errores.push("Los goles deben ser un número mayor o igual a 0.");
         }
-    } catch (error) {
-        alert("Error al conectar con la API: " + error.message);
-    } finally {
+    }
+    // Validaciones específicas para profesional
+    if (inputTituloUni.value || inputFacultad.value || inputAnioGradu.value) {
+        if (!inputTituloUni.value) errores.push("El título es obligatorio para profesionales.");
+        if (!inputFacultad.value) errores.push("La facultad es obligatoria para profesionales.");
+        if (isNaN(inputAnioGradu.value) || inputAnioGradu.value < 1900 || inputAnioGradu.value > new Date().getFullYear()) {
+            errores.push("El año de graduación debe ser válido.");
+        }
+    }
+
+
+    if (errores.length > 0) {
+        alert("Errores encontrados:\n" + errores.join("\n"));
         showSpinner(false);
+        return;
+    } else {
+        try {
+            console.log("Validacion exitosa. Datos enviados al servidor:", elementoModificado);
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(elementoModificado), // Convertir el objeto a JSON
+            });
+
+            if (response.status === 200) {
+                const elementoActualizado = await response.json(); // Recibir el objeto actualizado
+                console.log("Elemento modificado:", elementoActualizado);
+
+                // Actualizar el array local con el nuevo elemento
+                const index = arrayPersonas.findIndex(persona => persona.id == idModificar);
+                if (index !== -1) {
+                    arrayPersonas[index] = { ...arrayPersonas[index], ...elementoModificado }; // Actualizar el objeto en el array
+                    console.log("Nuevo array de personas:", arrayPersonas);
+                    mostrarTablaPersonas(arrayPersonas);
+                    showVistaTabla(true);
+                    limpiarInputs();
+                } else {
+                    alert("Elemento no encontrado en el array local.");
+                }
+            } else {
+                const errorText = await response.text();
+                console.error("Error del servidor:", errorText);
+                alert("Error al modificar el elemento. Código de respuesta: " + response.status + "\n" + errorText);
+                showVistaTabla(true);
+            }
+        } catch (error) {
+            alert("Error al conectar con la API: " + error.message);
+        } finally {
+            showSpinner(false);
+        }
     }
 });
 // ************* FIN MODIFICAR ELEMENTO *************
+
+
 
 // ************* ELIMINAR ELEMENTO *************
 function eliminarElemento(e) {
@@ -526,3 +646,11 @@ function inicializarApp() {
     console.log("Inicializando la aplicación con los datos:", arrayPersonas);
     mostrarTablaPersonas(arrayPersonas);
 }
+
+
+/*
+
+FALTA HACER LAS VALIDCACIONES DE LOS INPUTS EN EL FORMULARIO SEGUN LO QUE INDICA EL UML.
+
+
+*/
