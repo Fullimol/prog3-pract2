@@ -13,6 +13,7 @@ let formulario = document.getElementById("formulario");
 const btnModificar = document.getElementById("btnModificar");
 const btnEliminar = document.getElementById("btnEliminar");
 
+let inputId = document.getElementById("input-id");
 let inputNombre = document.getElementById("input-nombre");
 let inputApellido = document.getElementById("input-apellido");
 let inputEdad = document.getElementById("input-edad");
@@ -31,6 +32,8 @@ const labelProfesional = document.getElementById('label-profesional');
 //    ************* OBTENER DATA DE LA API *************
 const url = "https://examenesutn.vercel.app/api/PersonasFutbolistasProfesionales"
 let arrayPersonas = [];
+obtenerDatos();
+
 
 async function obtenerDatos() {
     try {
@@ -40,7 +43,7 @@ async function obtenerDatos() {
             const data = await response.json();
             instanciarPersonas(data);
             console.log("Datos cargados:", arrayPersonas);
-            inicializarApp(); // Mostrar el formulario de la lista
+            mostrarTablaPersonas(arrayPersonas);
         } else {
             alert("Error al obtener los datos. Código de respuesta: " + response.status);
         }
@@ -50,6 +53,7 @@ async function obtenerDatos() {
         showSpinner(false);
     }
 }
+
 
 function instanciarPersonas(data) {
     data.forEach(item => {
@@ -110,54 +114,6 @@ class Profesional extends Persona {
 }
 
 // --
-//recibo el nombre del input y pido los requisitos para guardarlo
-function validarInput(inputName, valor, tipoPersona) {
-    let mensaje = "";
-
-    // Validaciones generales
-    if (inputName === 'input-nombre' && valor === '') {
-        mensaje = "El nombre no puede estar vacío";
-    } else if (inputName === 'input-apellido' && valor === '') {
-        mensaje = "El apellido no puede estar vacío";
-    } else if (inputName === 'input-edad') {
-        if (valor === '') {
-            mensaje = "La edad no puede estar vacía";
-        } else if (valor <= 15) {
-            mensaje = "La edad debe ser mayor a 15";
-        }
-    }
-
-    // Validaciones específicas según la instancia
-    if (tipoPersona === "futbolista") {
-        if (inputName === 'input-equipo' && valor === '') {
-            mensaje = "El equipo no puede estar vacío";
-        } else if (inputName === 'input-posicion' && valor === '') {
-            mensaje = "La posición no puede estar vacía";
-        } else if (inputName === 'input-cantGoles') {
-            if (valor === '') {
-                mensaje = "La cantidad de goles no puede estar vacía";
-            } else if (valor < 0) {
-                mensaje = "La cantidad de goles debe ser mayor o igual a 0";
-            }
-        }
-    } else if (tipoPersona === "profesional") {
-        if (inputName === 'input-tituloUni' && valor === '') {
-            mensaje = "El título no puede estar vacío";
-        } else if (inputName === 'input-facultad' && valor === '') {
-            mensaje = "La facultad no puede estar vacía";
-        } else if (inputName === 'input-anioGrad') {
-            if (valor === '') {
-                mensaje = "El año de graduación no puede estar vacío";
-            } else if (valor < 1950) {
-                mensaje = "El año de graduación debe ser mayor a 1950";
-            }
-        }
-    }
-
-    return mensaje;
-}
-
-
 function showVistaTabla(mostrar) {
     if (mostrar) {
         containerTabla.classList.remove('hidden');
@@ -449,6 +405,7 @@ btnAceptarCambio.addEventListener("click", async function (e) {
 
     // Crear el objeto con los datos actuales de los inputs
     const elementoModificado = {
+        id: inputId.value.trim(),
         nombre: inputNombre.value.trim(),
         apellido: inputApellido.value.trim(),
         edad: parseInt(inputEdad.value),
@@ -505,13 +462,14 @@ btnAceptarCambio.addEventListener("click", async function (e) {
     } else {
         try {
             console.log("Validacion exitosa. Datos enviados al servidor:", elementoModificado);
-            const response = await fetch(url, {
-                method: "POST",
+            const response = await fetch(`${url}/${idModificar}`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(elementoModificado), // Convertir el objeto a JSON
+                body: JSON.stringify(elementoModificado),
             });
+              
 
             if (response.status === 200) {
                 const elementoActualizado = await response.json(); // Recibir el objeto actualizado
@@ -633,22 +591,3 @@ btnAceptarEliminar.addEventListener("click", async function (e) {
     }
 });
 // ************* FIN ELIMINAR ELEMENTO *************
-
-
-
-
-
-obtenerDatos();
-
-function inicializarApp() {
-    console.log("Inicializando la aplicación con los datos:", arrayPersonas);
-    mostrarTablaPersonas(arrayPersonas);
-}
-
-
-/*
-
-FALTA HACER LAS VALIDCACIONES DE LOS INPUTS EN EL FORMULARIO SEGUN LO QUE INDICA EL UML.
-
-
-*/

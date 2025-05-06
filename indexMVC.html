@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ABM Personas</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .centered {
+            text-align: center;
+        }
+
+        #spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #spinner.hidden {
+            display: none
+        }
+
+        #spinner div {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="lista">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Edad</th>
+                    <th>Equipo</th>
+                    <th>Posicion</th>
+                    <th>Titulo</th>
+                    <th>Facultad</th>
+                    <th>Modificar</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+            </tbody>
+        </table><button id="btn_agregar">Agregar Elemento</button>
+    </div>
+    <div id="formulario" class="hidden">
+        <h2>Formulario</h2>
+        <form id="form_abm">
+            <label for="id">ID</label>
+            <input type="text" id="id" disabled><br>
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" required><br>
+            <label for="apellido">Apellido</label>
+            <input type="text" id="apellido" required><br>
+            <label for="edad">Edad</label>
+            <input type="number" id="edad" required><br>
+            <label for="equipo">Equipo</label>
+            <input type="text" id="equipo"><br>
+            <label for="posicion">Posición</label>
+            <input type="text" id="posicion"><br>
+            <label for="titulo">Título</label>
+            <input type="text" id="titulo"><br>
+            <label for="facultad">Facultad</label>
+            <input type="text" id="facultad"><br>
+            <button type="submit" id="btn_aceptar">Aceptar</button>
+            <button type="button" id="btn_cancelar">Cancelar</button>
+        </form>
+    </div>
+    <div id="spinner" class="hidden">
+        <div></div>
+    </div>
+
+    <script>
+        class Persona {
+            constructor(id, nombre, apellido, edad) {
+                this.id = id;
+                this.nombre = nombre;
+                this.apellido = apellido;
+                this.edad = edad;
+            }
+        }
+
+        class Futbolista extends Persona {
+            constructor(id, nombre, apellido, edad, equipo, posicion) {
+                super(id, nombre, apellido, edad);
+                this.equipo = equipo;
+                this.posicion = posicion;
+            }
+        }
+
+        class Profesional extends Persona {
+            constructor(id, nombre, apellido, edad, titulo, facultad) {
+                super(id, nombre, apellido, edad);
+                this.titulo = titulo;
+                this.facultad = facultad;
+            }
+        }
+
+        class Modelo {
+            constructor() {
+                this.Personas = [];
+            }
+        }
+
+        class Vista {
+            constructor() {
+                this.lista = document.getElementById("lista");
+                this.formulario = document.getElementById("formulario");
+                this.spinner = document.getElementById("spinner");
+                this.tbody = document.getElementById("tbody");
+                this.btnAgregar = document.getElementById("btn_agregar");
+                this.btnCancelar = document.getElementById("btn_cancelar");
+                this.formABM = document.getElementById("form_abm");
+                this.btnAceptar = document.getElementById("btn_aceptar");
+            }
+
+            mostrarSpinner(show) {
+                this.spinner.classList.toggle("hidden", !show);
+            }
+
+            mostrarLista() {
+                this.lista.classList.remove("hidden");
+                this.formulario.classList.add("hidden");
+            }
+
+            mostrarFormulario() {
+                this.lista.classList.add("hidden");
+                this.formulario.classList.remove("hidden");
+            }
+
+            renderizarTabla(personas) {
+                this.tbody.innerHTML = "";
+
+                personas.forEach(p => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                    <td>${p.id}</td>
+<td>${p.nombre}</td>
+<td>${p.apellido}</td>
+<td>${p.edad}</td>
+<td>${p.equipo || "N/A"}</td>
+<td>${p.posicion || "N/A"}</td>
+<td>${p.titulo || "N/A"}</td>
+<td>${p.facultad || "N/A"}</td>
+<td><button class="modificar" data-id="${p.id}">Modificar</button></td>
+<td><button class="eliminar" data-id="${p.id}">Eliminar</button></td>
+                    `
+                    this.tbody.appendChild(tr);
+                });
+
+                /* personas.forEach(persona => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${persona.id}</td>
+                        <td>${persona.nombre}</td>
+                        <td>${persona.apellido}</td>
+                        <td>${persona.edad}</td>
+                        <td>${persona.equipo || ""}</td>
+                        <td>${persona.posicion || ""}</td>
+                        <td>${persona.titulo || ""}</td>
+                        <td>${persona.facultad || ""}</td>
+                        <td><button class="btn_modificar" data-id="${persona.id}">Modificar</button></td>
+                        <td><button class="btn_eliminar" data-id="${persona.id}">Eliminar</button></td>
+                    `;
+                    this.tbody.appendChild(tr);
+                }); */
+
+            }
+        }
+
+        class Control {
+            constructor(vista, modelo) {
+                this.vista = vista;
+                this.modelo = modelo;
+                this.URL = "https://examenesutn.vercel.app/api/PersonasFutbolistasProfesionales"
+                this.cargarDatosIniciales();
+                this.vista.btnAgregar.addEventListener("click", () => this.vista.mostrarFormulario());
+                this.vista.btnAceptar.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    this.created();
+                });
+            }
+
+            cargarDatosIniciales() {
+
+                this.vista.mostrarSpinner(true);
+
+                fetch(this.URL, { method: "GET", headers: { "Content-Type": "application/json" } })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        const arrayDePersonas = data.map(persona => {
+                            if (persona.equipo) {
+                                return new Futbolista(persona.id, persona.nombre, persona.apellido, persona.edad, persona.equipo, persona.posicion);
+                            } else {
+                                return new Profesional(persona.id, persona.nombre, persona.apellido, persona.edad, persona.titulo, persona.facultad);
+                            }
+                        })
+
+                        this.modelo.Personas = arrayDePersonas;
+                        this.vista.renderizarTabla(this.modelo.Personas);
+
+                    })
+                    .catch(err => {
+                        console.log({ a: err.message });
+                        window.alert("Error al cargar los datos")
+                    })
+                    .finally(() => {
+                        console.log("promesa finalizada");
+                        this.vista.mostrarSpinner(false);
+                    });
+
+                /// lo hago aca 
+
+            }
+
+
+
+            editarPorId(id) {
+
+            }
+
+            created() {
+                this.vista.mostrarSpinner(true);
+                const id = document.getElementById("id").value;
+                const nombre = document.getElementById("nombre").value;
+                const apellido = document.getElementById("apellido").value;
+                const edad = parseInt(document.getElementById("edad").value);
+                const equipo = document.getElementById("equipo").value;
+                const posicion = document.getElementById("posicion").value;
+                const titulo = document.getElementById("titulo").value;
+                const facultad = document.getElementById("facultad").value;
+
+
+
+                let persona;
+                if (equipo && posicion) {
+                    persona = new Futbolista(id, nombre, apellido, edad, equipo, posicion);
+                    persona.cantidadGoles = 10
+                } else if (titulo && facultad) {
+                    persona = new Profesional(id, nombre, apellido, edad, titulo, facultad);
+                    persona.añoGraduacion = 2005
+                }
+                delete persona.id;
+
+                console.log({ persona });
+
+                const optios = {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(persona)
+                }
+
+                fetch(this.URL, optios)
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log({ data });
+                        persona.id = JSON.parse(data).id
+
+                        this.vista.mostrarLista();
+
+                        const arrayDePersonas = [...this.modelo.Personas, persona];
+
+                        this.modelo.Personas = arrayDePersonas;
+
+                        this.vista.renderizarTabla(this.modelo.Personas);
+
+                    })
+                    .catch(err => {
+                        console.log({ a: err.message });
+
+                    })
+                    .finally(() => {
+                        console.log("promesa finalizada");
+                        this.vista.mostrarSpinner(false);
+                    });
+
+            }
+
+            eliminar(id) {
+
+            }
+        }
+
+        const modelo = new Modelo();
+        const vista = new Vista();
+        const control = new Control(vista, modelo);
+
+        /*         const pedido = new Promise((resolve, reject) => {
+                    const pizzeriaIsOpen = true;
+                    if (pizzeriaIsOpen) {
+                        resolve("La pizzeria está abierta");
+                    }
+                    if (!pizzeriaIsOpen) {
+                        resolve("La pizzeria está Cerrada");
+                    }
+                })
+        
+                pedido
+                    .then((respuesta) => {
+                        console.log(respuesta);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+        
+                console.log("Despues de verificar la pizzeria");
+                
+         */
+    </script>
+</body>
+
+</html>
