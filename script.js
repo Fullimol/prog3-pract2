@@ -1,7 +1,7 @@
 const containerTabla = document.querySelector('.container-tabla');
 const btnAgregar = document.getElementById("btnAgregar");
 const containerForm = document.querySelector('.container-form');
-const textoForm = document.getElementById("texto-form")
+const textoForm = document.getElementById("texto-form");
 const btnAceptarCambio = document.getElementById("btnAceptarCambio");
 const btnAceptarNuevo = document.getElementById("btnAceptarNuevo");
 const btnAceptarEliminar = document.getElementById("btnAceptarEliminar");
@@ -9,20 +9,20 @@ const btnCancelar = document.getElementById("btnCancelar");
 const spinner = document.getElementById("spinner");
 const tabla = document.getElementById('tablaPersonas');
 let cuerpo = tabla.querySelector('tbody');
-let formulario = document.getElementById("formulario");
+const formulario = document.getElementById("formulario");
 const btnModificar = document.getElementById("btnModificar");
 const btnEliminar = document.getElementById("btnEliminar");
 
-let inputId = document.getElementById("input-id");
-let inputNombre = document.getElementById("input-nombre");
-let inputApellido = document.getElementById("input-apellido");
-let inputEdad = document.getElementById("input-edad");
-let inputEquipo = document.getElementById("input-equipo");
-let inputPosicion = document.getElementById("input-posicion");
-let inputCantGoles = document.getElementById("input-cantGoles");
-let inputTituloUni = document.getElementById("input-tituloUni");
-let inputFacultad = document.getElementById("input-facultad");
-let inputAnioGradu = document.getElementById("input-anioGrad");
+const inputId = document.getElementById("input-id");
+const inputNombre = document.getElementById("input-nombre");
+const inputApellido = document.getElementById("input-apellido");
+const inputEdad = document.getElementById("input-edad");
+const inputEquipo = document.getElementById("input-equipo");
+const inputPosicion = document.getElementById("input-posicion");
+const inputCantGoles = document.getElementById("input-cantGoles");
+const inputTituloUni = document.getElementById("input-tituloUni");
+const inputFacultad = document.getElementById("input-facultad");
+const inputAnioGradu = document.getElementById("input-anioGrad");
 
 const labelFutbolista = document.getElementById('label-futbolista');
 const labelProfesional = document.getElementById('label-profesional');
@@ -313,7 +313,7 @@ btnAceptarNuevo.addEventListener("click", async function (e) {
                 body: JSON.stringify(nuevoElemento), // Convertir el objeto a JSON
 
             });
-            console.log("Validacion exitosa. OBJETO A ENVIAR!!!!:", JSON.stringify(nuevoElemento, null, 2));
+            console.log("Validacion exitosa. OBJETO A ENVIAR!!!!:", nuevoElemento);
 
 
             if (response.status === 200) {
@@ -462,17 +462,18 @@ btnAceptarCambio.addEventListener("click", async function (e) {
     } else {
         try {
             console.log("Validacion exitosa. Datos enviados al servidor:", elementoModificado);
-            const response = await fetch(`${url}/${idModificar}`, {
+            const response = await fetch(url, {
+                // Sabe que persona modificar porque lee la clave id de mi "elementoModificado"
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(elementoModificado),
             });
-              
+
 
             if (response.status === 200) {
-                const elementoActualizado = await response.json(); // Recibir el objeto actualizado
+                const elementoActualizado = await response.text(); // Recibir el objeto actualizado
                 console.log("Elemento modificado:", elementoActualizado);
 
                 // Actualizar el array local con el nuevo elemento
