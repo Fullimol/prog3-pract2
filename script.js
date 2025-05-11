@@ -12,7 +12,6 @@ let cuerpo = tabla.querySelector('tbody');
 const formulario = document.getElementById("formulario");
 const btnModificar = document.getElementById("btnModificar");
 const btnEliminar = document.getElementById("btnEliminar");
-
 const inputId = document.getElementById("input-id");
 const inputNombre = document.getElementById("input-nombre");
 const inputApellido = document.getElementById("input-apellido");
@@ -23,7 +22,6 @@ const inputCantGoles = document.getElementById("input-cantGoles");
 const inputTituloUni = document.getElementById("input-tituloUni");
 const inputFacultad = document.getElementById("input-facultad");
 const inputAnioGradu = document.getElementById("input-anioGrad");
-
 const labelFutbolista = document.getElementById('label-futbolista');
 const labelProfesional = document.getElementById('label-profesional');
 
